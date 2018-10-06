@@ -15,11 +15,11 @@ namespace University.Web.Areas.Identity
             builder.ConfigureServices((context, services) => {
                 services.AddDbContext<UniversityContext>(options =>
                     options.UseSqlServer(
-                        context.Configuration.GetConnectionString("UniversityWebContextConnection")));
+                        context.Configuration.GetConnectionString("UniversityContextConnection")));
 
-                services.AddDefaultIdentity<IdentityUser>()
-                    .AddEntityFrameworkStores<UniversityContext>();
-            });
+				services.AddIdentity<IdentityUser, IdentityRole>()
+					.AddEntityFrameworkStores<UniversityContext>().AddDefaultTokenProviders();
+			});
         }
     }
 }

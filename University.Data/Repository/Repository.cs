@@ -9,8 +9,8 @@ namespace University.Data.Repository
 {
 	public class Repository<T> : IRepository<T> where T : BaseEntity
 	{
-		private readonly UniversityContext context;
-		private DbSet<T> entities;
+		protected readonly UniversityContext context;
+		protected DbSet<T> entities;
 		public Repository(UniversityContext context)
 		{
 			this.context = context;

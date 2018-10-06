@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using University.Data;
+using University.Data.Repository;
 
 namespace University.Web
 {
@@ -31,12 +33,16 @@ namespace University.Web
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 			});
 
+			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+			services.AddTransient<DepartmentRepository>();
+			services.AddTransient<UserRepository>();
+			services.AddTransient<DbInitializer>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, DbInitializer seeder)
 		{
 			if (env.IsDevelopment())
 			{
@@ -52,12 +58,15 @@ namespace University.Web
 			app.UseStaticFiles();
 			app.UseCookiePolicy();
 			app.UseAuthentication();
+
 			app.UseMvc(routes =>
 			{
 				routes.MapRoute(
 					name: "default",
 					template: "{controller=Home}/{action=Index}/{id?}");
 			});
+
+			//seeder.SeedDataAsync().Wait();
 		}
 	}
 }

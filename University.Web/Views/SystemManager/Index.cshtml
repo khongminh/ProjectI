@@ -1,0 +1,41 @@
+﻿@model IEnumerable<University.Entity.Department>
+
+@{
+    ViewData["Title"] = "Khoa viện";
+    var i = 1;
+}
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Danh sách khoa viện
+  </div>
+  <div class="panel-body">
+    <a class="btn btn-primary" asp-action="Create">Thêm khoa viện</a>
+    <table id="orders" class="table table-hover table-bordered table-condensed">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên</th>
+          <th>Website</th>
+          <th>Địa chỉ</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model)
+        {
+          <tr>
+            <td>@i</td>
+            <td>@item.Deptname</td>
+            <td>@item.Website</td>
+            <td>@item.Address</td>
+            <td><a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-link">Chi tiết</a></td>
+          </tr>
+          i += 1;
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
