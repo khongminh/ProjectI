@@ -13,12 +13,24 @@ namespace University.Data.Repository
 		{
 		}
 
-		public Task<Department> GetDetail(long id)
+		public Task<Department> GetStudents(long id)
 		{
-			var department = this.entities.Include(d => d.Courses)
-											.Include(d => d.Students)
-											.Include(d => d.Teachers)
-											.SingleOrDefaultAsync(d => d.Id == id);
+			var department = this.entities.Include(d => d.Students)
+									.SingleOrDefaultAsync(d => d.Id == id);
+			return department;
+		}
+
+		public Task<Department> GetCourses(long id)
+		{
+			var department = this.entities.Include(d => d.Students)
+									.SingleOrDefaultAsync(d => d.Id == id);
+			return department;
+		}
+
+		public Task<Department> GetTeachers(long id)
+		{
+			var department = this.entities.Include(d => d.Students)
+									.SingleOrDefaultAsync(d => d.Id == id);
 			return department;
 		}
 

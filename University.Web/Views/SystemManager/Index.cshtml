@@ -28,9 +28,13 @@
           <tr>
             <td>@i</td>
             <td>@item.Deptname</td>
-            <td>@item.Website</td>
+            <td><a class="btn btn-link" href="@item.Website">@item.Website</a></td>
             <td>@item.Address</td>
-            <td><a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-link">Chi tiết</a></td>
+            <td>
+              <a asp-action="DeptStudent" asp-route-id="@item.Id" class="btn btn-link">Sinh viên</a>
+              <a asp-action="DeptCourse" asp-route-id="@item.Id" class="btn btn-link">Học phần</a>
+              <a asp-action="DeptTeacher" asp-route-id="@item.Id" class="btn btn-link">Giảng viên</a>
+            </td>
           </tr>
           i += 1;
         }

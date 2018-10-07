@@ -1,0 +1,40 @@
+﻿@model University.Entity.Department
+
+@{
+  ViewData["Title"] = "Học phần";
+  var i = 1;
+}
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Danh sách học phần - @Model.Deptname
+  </div>
+  <div class="panel-body">
+    <table id="orders" class="table table-hover table-bordered table-condensed">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Mã học phần</th>
+          <th>Tên</th>
+          <th>Số tín chỉ</th>
+          <th>Mô tả</th>
+          <th>Học phần điều kiện</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model.Courses)
+        {
+          <tr>
+            <td>@i</td>
+            <td>@item.Code</td>
+            <td>@item.Title</td>
+            <td>@item.Credits</td>
+            <td>@item.Description</td>
+            <td></td>
+          </tr>
+          i += 1;
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

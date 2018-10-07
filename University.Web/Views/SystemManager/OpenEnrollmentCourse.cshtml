@@ -1,0 +1,90 @@
+﻿@model IEnumerable<University.Entity.TimeEnrollment>
+
+@{
+    var i = 1;
+    ViewData["Title"] = "Mở đăng ký lớp";
+}
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Mở đăng ký lớp
+  </div>
+  <div class="panel-body">
+    <form class="form-inline" asp-action="OpenEnrollmentCourse" method="post">
+      <div class="form-group col-md-3">
+        <label>Kỳ học</label>
+        <input type="number" class="form-control" name="Semester" id="semester" />
+      </div>
+      <div class="form-group col-md-4">
+        <label>Bắt đầu</label>
+        <div class='input-group date'>
+          <input type='text' class="form-control" name="StartTime" id="start" />
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <label>Kết thúc</label>
+        <div class='input-group date'>
+          <input type='text' class="form-control" name="EndTime" id="end" />
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-default">Lưu</button>
+    </form>
+    <br />
+    <table class="table table-hover table-bordered table-condensed">
+      <thead>
+        <tr>
+          <th>Kỳ học</th>
+          <th>Bắt đầu</th>
+          <th>Kết thúc</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model)
+        {
+          <tr>
+            <td>@item.Semester</td>
+            <td>@item.StartTime</td>
+            <td>@item.EndTime</td>
+            @if(i == 1)
+            {
+                <td><button class="btn btn-link" id="edit">Chỉnh sửa</button></td>
+            }
+            else
+            {
+                <td></td>
+            }
+          </tr>
+          i += 1;
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@section Styles{
+  <link rel="stylesheet" href="~/lib/bootstrap-datetimepicker/bootstrap-datetimepicker.css" />
+}
+
+@section Scripts{
+  <script src="~/lib/bootstrap-datetimepicker/bootstrap-datetimepicker.js"></script>
+  <script>
+    $(function () {
+      $('.date').datetimepicker();
+      $('#edit').click(function () {
+        var semester = $('table tbody tr:first-child').find('td').eq(0).text();
+        $('#semester').val(Number(semester));
+        var start = $('table tbody tr:first-child').find('td').eq(1).text();
+        $('#start').val(start);
+        var end = $('table tbody tr:first-child').find('td').eq(2).text();
+        $('#end').val(end);
+      })
+    });
+  </script>
+}

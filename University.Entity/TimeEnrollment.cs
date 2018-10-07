@@ -6,7 +6,7 @@ namespace University.Entity
 {
 	public class TimeEnrollment : BaseEntity
 	{
-		public string Semester { get; set; }
+		public long Semester { get; set; }
 		public DateTime StartTime { get; set; }
 		public DateTime EndTime { get; set; }
 	}
