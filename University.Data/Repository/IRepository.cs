@@ -9,6 +9,7 @@ namespace University.Data.Repository
 	public interface IRepository<T> where T: BaseEntity
 	{
 		Task<IEnumerable<T>> GetAllAsync();
+		IEnumerable<T> GetAll();
 		Task<T> GetAsync(long id);
 		void Insert(T entity);
 		void Update(T entity);

@@ -5,17 +5,14 @@
     ViewData["Title"] = "Mở đăng ký lớp";
 }
 
-<div class="panel panel-primary">
-  <div class="panel-heading">
-    Mở đăng ký lớp
-  </div>
-  <div class="panel-body">
-    <form class="form-inline" asp-action="OpenEnrollmentCourse" method="post">
-      <div class="form-group col-md-3">
+<div class="row">
+  <div class="col-md-offset-4 col-md-3">
+    <form class="form-horizontal" asp-action="OpenEnrollmentCourse" method="post">
+      <div class="form-group">
         <label>Kỳ học</label>
         <input type="number" class="form-control" name="Semester" id="semester" />
       </div>
-      <div class="form-group col-md-4">
+      <div class="form-group">
         <label>Bắt đầu</label>
         <div class='input-group date'>
           <input type='text' class="form-control" name="StartTime" id="start" />
@@ -24,7 +21,7 @@
           </span>
         </div>
       </div>
-      <div class="form-group col-md-4">
+      <div class="form-group">
         <label>Kết thúc</label>
         <div class='input-group date'>
           <input type='text' class="form-control" name="EndTime" id="end" />
@@ -33,9 +30,21 @@
           </span>
         </div>
       </div>
-      <button type="submit" class="btn btn-default">Lưu</button>
+      <div class="form-group">
+        <button type="submit" class="btn btn-default">Lưu</button>
+      </div>
     </form>
+  </div>
+</div>
+
+
+<br />
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
     <br />
+  </div>
+  <div class="panel-body">
     <table class="table table-hover table-bordered table-condensed">
       <thead>
         <tr>
@@ -54,7 +63,13 @@
             <td>@item.EndTime</td>
             @if(i == 1)
             {
-                <td><button class="btn btn-link" id="edit">Chỉnh sửa</button></td>
+            <td>
+              @if (DateTime.Now >= item.StartTime && DateTime.Now <= item.EndTime)
+              {
+                <p>Đang trong thời điểm đăng ký</p>
+              }
+              <a class="btn-link" id="edit">Chỉnh sửa</a>
+            </td>
             }
             else
             {

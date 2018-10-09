@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using University.Entity;
@@ -15,6 +16,11 @@ namespace University.Data.Repository
 		{
 			this.context = context;
 			entities = context.Set<T>();
+		}
+
+		public IEnumerable<T> GetAll()
+		{
+			return entities.ToList();
 		}
 
 		public async Task<IEnumerable<T>> GetAllAsync()

@@ -42,6 +42,10 @@
               <li><a asp-area="" asp-controller="SystemManager" asp-action="Index">Khoa Viện</a></li>
               <li><a asp-area="" asp-controller="SystemManager" asp-action="OpenEnrollmentCourse">Đăng ký lớp</a></li>
             }
+            @if (User.IsInRole("DepartmentAdmin"))
+            {
+              <li><a asp-area="" asp-controller="DepartmentManagerController" asp-action="">Khoa Viện</a></li>
+            }
           }
         </ul>
         <partial name="_LoginPartial" />
