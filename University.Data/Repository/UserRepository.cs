@@ -41,5 +41,16 @@ namespace University.Data.Repository
 			var user = await _userManager.FindByNameAsync(userName);
 			return user.Id;
 		}
+
+		public async Task<bool> DeleteUser(string userId)
+		{
+			var user = await this._userManager.FindByIdAsync(userId);
+			if (user == null)
+				return false;
+
+			await this._userManager.DeleteAsync(user);
+			await this._context.SaveChangesAsync();
+			return true;
+		}
 	}
 }

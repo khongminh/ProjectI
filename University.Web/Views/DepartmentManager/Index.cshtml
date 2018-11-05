@@ -1,0 +1,206 @@
+﻿@{
+  ViewData["Title"] = "Index";
+}
+
+<table id="studentTable" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>MSSV</th>
+      <th>Ho ten</th>
+      <th>Thong tin</th>
+      <th><button id="insert" class="btn btn-primary">Insert</button></th>
+    </tr>
+  </thead>
+</table>
+
+<div class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <input id="id" hidden />
+          <div class="form-group">
+            <label class="col-sm-2 control-label">MSSV</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Ho ten</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Thong tin</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="information">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveModal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts{
+  <script>
+    $(document).ready(function () {
+      getStudentList();
+
+      $('#insert').click(function () {
+        $('.modal-title').text("Add Student");
+        $('.modal').modal({ show: true });
+        console.log($('#id').val());
+      });
+
+      $('.modal').on('hidden.bs.modal', function () {
+        $('#id').val(0);
+        $('#code').val('');
+        $('#name').val('');
+        $('#information').val('');
+      });
+
+      $('#saveModal').click(function () {
+        var obj = Student;
+        obj.id = $('#id').val();
+        obj.code = $('#code').val();
+        obj.name = $('#name').val();
+        obj.information = $('#information').val();
+
+        if (obj.id == 0) {
+          $.ajax({
+            url: '/api/AddStudent',
+            type: 'POST',
+            data: JSON.stringify(obj),
+            contentType: 'application/json',
+            dataType: 'html',
+            success: function (msg) {
+              $('.modal').modal('hide');
+              getStudentList();
+              $.notify("Thêm thành công");
+            },
+            error: function () {
+              $('.modal').modal('hide');
+              $.notify("Da xay ra loi");
+            }
+          });
+        }
+        else {
+          $.ajax({
+            url: '/api/UpdateStudent/' + obj.id,
+            type: 'PUT',
+            data: JSON.stringify(obj),
+            contentType: 'application/json',
+            dataType: 'html',
+            success: function (msg) {
+              $('.modal').modal('hide');
+              getStudentList();
+              $.notify("Update thành công");
+            },
+            error: function () {
+              $('.modal').modal('hide');
+              $.notify("Da xay ra loi");
+            }
+          });
+        }
+      });
+
+    });
+
+    var Student = {
+      id: 0,
+      code: "",
+      name: "",
+      information: ""
+    }
+
+    // Get all Employees to display
+    function getStudentList() {
+      $.ajax({
+        url: '/api/GetStudents/',
+        type: 'GET',
+        dataType: 'json',
+        success: function (students) {
+          studentListSuccess(students);
+        },
+        error: function (request, message, error) {
+          alert("Da xay ra loi")
+        }
+      });
+    }
+
+    function studentListSuccess(students) {
+      $("#studentTable tbody").remove();
+      $.each(students, function (index, student) {
+        studentAddRow(student);
+      });
+    }
+
+    function studentAddRow(employee) {
+      if ($("#studentTable tbody").length == 0) {
+        $("#studentTable").append("<tbody></tbody>");
+      }
+
+      $("#studentTable tbody").append(
+        studentBuildTableRow(employee));
+    }
+
+    function studentBuildTableRow(student) {
+      var newRow =
+        `<tr>` +
+        `<td>${student.id}</td>` +
+        `<td>${student.code}</td>` +
+        `<td>${student.name}</td>` +
+        `<td>${student.information}</td>` +
+        `<td>` +
+        `<button class="btn btn-warning" data-id="${student.id}" data-name="${student.name}" data-information="${student.information}" data-code="${student.code}" onclick="editStudentModal(this)">Update</button> &nbsp` +
+        `<button class="btn btn-danger" data-id="${student.id}" onclick="deleteStudent(this)">Delete</button>` +
+        `</td>` +
+        `</tr>`;
+      return newRow;
+    }
+
+    function editStudentModal(item) {
+      $('.modal-title').text('Edit Student');
+
+      console.log($(item).data('name'));
+      $('#id').val($(item).data('id'));
+      $('#code').val($(item).data('code'));
+      $('#name').val($(item).data('name'));
+      $('#information').val($(item).data('information'));
+
+      $('.modal').modal({ show: true });
+    }
+
+    function deleteStudent(item) {
+      var id = $(item).data('id');
+      if (confirm("Bạn có chắc chắn muốn xóa: " + id)) {
+        $.ajax({
+          url: '/api/DeleteStudent/'+id,
+          type: 'DELETE',
+          dataType: 'html',
+          success: function (msg) {
+            getStudentList();
+            $.notify("Xoa thanh cong");
+          },
+          error: function (request, message, error) {
+            alert("Da xay ra loi");
+          }
+        });
+      }
+    }
+
+    
+
+  </script>
+}
