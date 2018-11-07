@@ -11,7 +11,7 @@ namespace University.Entity
 		public string Description { get; set; }
 		public int Credits { get; set; }
 
-		public int DepartmentId { get; set; }
+		public long DepartmentId { get; set; }
 		public Department Department { get; set; }
 	}
 }

@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace University.Web.Models
 {
-	public class StudentVM
+	public class TeacherVM
 	{
 		public long Id { get; set; }
 
 		[Required]
 		public string Code { get; set; }
-
 		[Required]
 		public string Name { get; set; }
 		public string Information { get; set; }

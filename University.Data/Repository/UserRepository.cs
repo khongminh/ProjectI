@@ -25,7 +25,7 @@ namespace University.Data.Repository
 		{
 			var studentUser = new IdentityUser()
 			{
-				UserName = userName
+				UserName = userName + roleName
 			};
 			try
 			{
@@ -38,7 +38,7 @@ namespace University.Data.Repository
 			{
 				return null;
 			}
-			var user = await _userManager.FindByNameAsync(userName);
+			var user = await _userManager.FindByNameAsync(userName + roleName);
 			return user.Id;
 		}
 

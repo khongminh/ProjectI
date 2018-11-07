@@ -8,5 +8,8 @@ namespace University.Entity
 	{
 		public long CourseId { get; set; }
 		public long PrereqId { get; set; }
+
+		public string CourseCode { get; set; }
+		public string PrereqCode { get; set; }
 	}
 }
