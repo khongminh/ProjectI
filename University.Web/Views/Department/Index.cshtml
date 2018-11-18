@@ -1,15 +1,14 @@
 ﻿@{
   ViewData["Title"] = "Index";
 }
-
+<button id="insert" class="btn btn-primary">Insert</button>
 <table id="studentTable" class="table table-bordered">
   <thead>
     <tr>
       <th>Id</th>
-      <th>MSSV</th>
-      <th>Ho ten</th>
-      <th>Thong tin</th>
-      <th><button id="insert" class="btn btn-primary">Insert</button></th>
+      <th>Khoa viện</th>
+      <th>Địa chỉ</th>
+      <th>Website</th>
     </tr>
   </thead>
 </table>
@@ -23,23 +22,28 @@
       </div>
       <div class="modal-body">
         <form class="form-horizontal">
-          <input id="id" hidden />
           <div class="form-group">
-            <label class="col-sm-2 control-label">MSSV</label>
-            <div class="col-sm-10">
-              <input class="form-control" id="code">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">Ho ten</label>
+            <label class="col-sm-2 control-label">Khoa viện</label>
             <div class="col-sm-10">
               <input class="form-control" id="name">
             </div>
           </div>
           <div class="form-group">
-            <label class="col-sm-2 control-label">Thong tin</label>
+            <label class="col-sm-2 control-label">Tên</label>
             <div class="col-sm-10">
-              <input class="form-control" id="information">
+              <input class="form-control" id="deptEgName" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Địa chỉ</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="address" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Website</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="website">
             </div>
           </div>
         </form>
@@ -58,76 +62,55 @@
       getStudentList();
 
       $('#insert').click(function () {
-        $('.modal-title').text("Add Student");
+        $('.modal-title').text("Add Department");
         $('.modal').modal({ show: true });
-        console.log($('#id').val());
       });
 
       $('.modal').on('hidden.bs.modal', function () {
-        $('#id').val(0);
-        $('#code').val('');
         $('#name').val('');
-        $('#information').val('');
+        $('#address').val('');
+        $('#website').val('');
       });
 
       $('#saveModal').click(function () {
         var obj = Student;
-        obj.id = $('#id').val();
-        obj.code = $('#code').val();
-        obj.name = $('#name').val();
-        obj.information = $('#information').val();
+        obj.deptname = $('#name').val();
+        obj.address = $('#address').val();
+        obj.website = $('#website').val();
+        obj.deptegname = $('#deptEgName').val();
 
-        if (obj.id == 0) {
-          $.ajax({
-            url: '/api/AddStudent',
-            type: 'POST',
-            data: JSON.stringify(obj),
-            contentType: 'application/json',
-            dataType: 'html',
-            success: function (msg) {
-              $('.modal').modal('hide');
-              getStudentList();
-              $.notify("Thêm thành công");
-            },
-            error: function () {
-              $('.modal').modal('hide');
-              $.notify("Da xay ra loi");
-            }
-          });
-        }
-        else {
-          $.ajax({
-            url: '/api/UpdateStudent/' + obj.id,
-            type: 'PUT',
-            data: JSON.stringify(obj),
-            contentType: 'application/json',
-            dataType: 'html',
-            success: function (msg) {
-              $('.modal').modal('hide');
-              getStudentList();
-              $.notify("Update thành công");
-            },
-            error: function () {
-              $('.modal').modal('hide');
-              $.notify("Da xay ra loi");
-            }
-          });
-        }
+        $.ajax({
+          url: '/api/Department/Add',
+          type: 'POST',
+          data: JSON.stringify(obj),
+          contentType: 'application/json',
+          dataType: 'html',
+          success: function (msg) {
+            $('.modal').modal('hide');
+            getStudentList();
+            $.notify("Thêm thành công");
+          },
+          error: function () {
+            $('.modal').modal('hide');
+            $.notify("Da xay ra loi");
+          }
+        });
+        
       });
 
     });
 
     var Student = {
-      id: 0,
-      code: "",
-      name: "",
-      information: ""
+      deptname: "",
+      deptegname: "",
+      address: "",
+      website: ""
     }
 
     // Get all Employees to display
     function getStudentList() {
       $.ajax({
-        url: '/api/GetStudents/',
+        url: '/api/Department/',
         type: 'GET',
         dataType: 'json',
         success: function (students) {
@@ -159,13 +142,9 @@
       var newRow =
         `<tr>` +
         `<td>${student.id}</td>` +
-        `<td>${student.code}</td>` +
-        `<td>${student.name}</td>` +
-        `<td>${student.information}</td>` +
-        `<td>` +
-        `<button class="btn btn-warning" data-id="${student.id}" data-name="${student.name}" data-information="${student.information}" data-code="${student.code}" onclick="editStudentModal(this)">Update</button> &nbsp` +
-        `<button class="btn btn-danger" data-id="${student.id}" onclick="deleteStudent(this)">Delete</button>` +
-        `</td>` +
+        `<td>${student.deptname}(${student.deptEgName})</td>` +
+        `<td>${student.address}</td>` +
+        `<td>${student.website}</td>` +
         `</tr>`;
       return newRow;
     }
@@ -186,7 +165,7 @@
       var id = $(item).data('id');
       if (confirm("Bạn có chắc chắn muốn xóa: " + id)) {
         $.ajax({
-          url: '/api/DeleteStudent/'+id,
+          url: '/api/Student/Delete/' + id,
           type: 'DELETE',
           dataType: 'html',
           success: function (msg) {
@@ -200,7 +179,8 @@
       }
     }
 
-    
+
 
   </script>
 }
+

@@ -1,0 +1,91 @@
+﻿@model IEnumerable<University.Entity.Classroom>
+@{
+  ViewData["Title"] = "Home Page";
+}
+
+@if (Convert.ToBoolean(ViewData["isTimeEnrollment"]))
+{
+    <h3 class="text-center">Đăng ký học tập kỳ @ViewData["semester"]</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th hidden></th>
+        <th>Mã lớp</th>
+        <th>Mã học phần</th>
+        <th>Tên học phần</th>
+        <th>Giảng viên</th>
+        <th>Thời gian</th>
+        <th>Sô lượng max</th>
+        <th>Số lượng đã đăng ký</th>
+        @if (User.IsInRole("Student"))
+        {
+          <th></th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in Model)
+      {
+        <tr>
+          <td hidden>@item.Id</td>
+          <td>@item.Code</td>
+          <td>@item.Course.Code</td>
+          <td>@item.Course.Title</td>
+          <td>@item.Teacher.Name</td>
+          <td>
+            @foreach (var timeslot in item.TimeSlots)
+            {
+              <p>@timeslot.Day: @timeslot.StartTime -> @timeslot.EndTime : @timeslot.Room</p>
+            }
+          </td>
+          <td>@item.MaxStudent</td>
+          <td>@item.Enrollments.Count</td>
+          @if (User.IsInRole("Student"))
+          {
+            <td><input type="checkbox" /></td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (User.IsInRole("Student"))
+  {
+    <button class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Đăng ký</button>
+  }
+
+  <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="modal-body">
+          Bạn có chắc chắn muốn gửi
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn" id="send" data-dismiss="modal">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @section Scripts{
+    <script>
+    $(document).ready(function () {
+     $('table').data('studentId', @ViewData["studentId"]);
+    });
+    </script>
+    <script src="~/lib/aspnet/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/enrollment.js"></script>
+  }
+}
+else
+{
+  <h1 class="text-center">Không phải thời điểm đăng ký học tập</h1>
+}
+
+
+
+
+

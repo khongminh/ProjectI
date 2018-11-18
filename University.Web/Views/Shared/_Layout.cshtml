@@ -7,7 +7,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@ViewData["Title"] - University.Web</title>
+  <title>@ViewData["Title"]</title>
 
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
@@ -15,7 +15,7 @@
   @RenderSection("Styles", required: false)
 </head>
 <body>
-  <nav class="navbar navbar-inverse navbar-fixed-top">
+  <nav class="navbar navbar-inverse navbar-fixed-top ">
     <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -24,7 +24,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Đại học bách khoa hà nội</a>
+        <a asp-area="" asp-controller="Home" asp-action="Index"><img src="https://www.hust.edu.vn/hust-theme/images/home-button.png" /></a>
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
@@ -32,12 +32,24 @@
           {
             @if (User.IsInRole("SystemAdmin"))
             {
-              <li><a asp-area="" asp-controller="SystemManager" asp-action="Index">Khoa Viện</a></li>
+              <li><a asp-area="" asp-controller="Department" asp-action="Index">Khoa Viện</a></li>
               <li><a asp-area="" asp-controller="SystemManager" asp-action="OpenEnrollmentCourse">Đăng ký lớp</a></li>
             }
             @if (User.IsInRole("DepartmentAdmin"))
             {
-              <li><a asp-area="" asp-controller="DepartmentManagerController" asp-action="">Khoa Viện</a></li>
+              <li><a asp-area="" asp-controller="Student" asp-action="IndexStudent">Danh sách sinh viên</a></li>
+              <li><a asp-area="" asp-controller="Teacher" asp-action="IndexTeacher">Danh sách giảng viên</a></li>
+              <li><a asp-area="" asp-controller="Course" asp-action="IndexCourse">Danh sách học phần</a></li>
+              <li><a asp-area="" asp-controller="Classroom" asp-action="IndexSemester">Đăng ký lớp</a></li>
+            }
+            @if (User.IsInRole("Student"))
+            {
+              <li><a asp-area="" asp-controller="Enrollment" asp-action="Index">Đăng ký lớp</a></li>
+              <li><a asp-area="" asp-controller="Enrollment" asp-action="StudentEnrollmentIndex">Lớp của tôi</a></li>
+            }
+            @if (User.IsInRole("Teacher"))
+            {
+              <li><a asp-area="" asp-controller="Enrollment" asp-action="Index">Danh sách lớp</a></li>
             }
           }
         </ul>
@@ -52,10 +64,6 @@
     <br />
     <br />
     @RenderBody()
-    <hr />
-    <footer>
-      <p>&copy; 2018 - University.Web</p>
-    </footer>
   </div>
 
   <script src="~/lib/jquery/dist/jquery.js"></script>

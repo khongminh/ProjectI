@@ -1,0 +1,326 @@
+﻿@section Styles{
+  <link rel="stylesheet" href="~/css/bootstrap-multiselect.css" type="text/css" />
+}
+@{
+  ViewData["Title"] = "Index";
+}
+
+<table id="studentTable" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Mã học phần</th>
+      <th>Tên học phần</th>
+      <th>Số tín chỉ</th>
+      <th>Mô tả</th>
+      <th>Học phần điều kiện</th>
+      <th><button id="insert" class="btn btn-primary">Insert</button></th>
+    </tr>
+  </thead>
+</table>
+
+<div id="modalCourse" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <input id="id" hidden />
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Mã học phần</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Tên học phần</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="title">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Mô tả</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="description">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Số tín chỉ</label>
+            <div class="col-sm-10">
+              <input class="form-control" id="credits">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveModal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalPreque" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Học phần điều kiện</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="savePrerequite">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@section Scripts{
+  <script type="text/javascript" src="~/js/bootstrap-multiselect.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      getStudentList();
+
+      $('#insert').click(function () {
+        $('#modalCourse .modal-title').text("Add Course");
+        $('#modalCourse').modal('show');
+      });
+
+      $('#modalCourse').on('hidden.bs.modal', function () {
+        $('#id').val(0);
+        $('#code').val('');
+        $('#title').val('');
+        $('#description').val('');
+        $('#credits').val(0);
+      });
+
+      $('#saveModal').click(function () {
+        var obj = Student;
+        obj.id = $('#id').val();
+        obj.code = $('#code').val();
+        obj.title = $('#title').val();
+        obj.description = $('#description').val();
+        obj.credits = $('#credits').val();
+
+        if (obj.id == 0) {
+          $.ajax({
+            url: '/api/Course/Add',
+            type: 'POST',
+            data: JSON.stringify(obj),
+            contentType: 'application/json',
+            dataType: 'html',
+            success: function (msg) {
+              $('#modalCourse').modal('hide');
+              getStudentList();
+              $.notify("Thêm thành công");
+            },
+            error: function () {
+              $('#modalCourse').modal('hide');
+              $.notify("Da xay ra loi");
+            }
+          });
+        }
+        else {
+          $.ajax({
+            url: '/api/Course/Update' + obj.id,
+            type: 'PUT',
+            data: JSON.stringify(obj),
+            contentType: 'application/json',
+            dataType: 'html',
+            success: function (msg) {
+              $('#modalCourse').modal('hide');
+              getStudentList();
+              $.notify("Update thành công");
+            },
+            error: function () {
+              $('#modalCourse').modal('hide');
+              $.notify("Da xay ra loi");
+            }
+          });
+        }
+      });
+
+      $('#savePrerequite').click(function () {
+        var pres = $('#prerequites').val();
+
+        var id = $(this).data('id');
+        var code = $(this).data('code');
+
+        var datas = { id: id, prerequisites: [] };
+
+        pres.forEach(function (element) {
+          var idPre = Number((element.split(" "))[0]);
+          var codePre = (element.split(" "))[1];
+
+          var obj = new Object()
+          obj.courseId = id;
+          obj.courseCode = code;
+          obj.prereqId = idPre;
+          obj.prereqCode = codePre;
+
+          datas.prerequisites.push(obj);
+        });
+
+        $.ajax({
+          url: '/api/Course/UpdatePrerequisite/',
+          type: 'POST',
+          data: JSON.stringify(datas),
+          contentType: 'application/json',
+          success: function (msg) {
+            $('#modalPreque').modal('hide');
+            getStudentList();
+            $.notify("Update thành công");
+          },
+          error: function () {
+            $('#modalPreque').modal('hide');
+            $.notify("Da xay ra loi");
+          }
+        });
+
+      })
+
+    });
+
+    var Prerequisite = {
+      courseId: 0,
+      prereqId: 0,
+      courseCode: "",
+      prereqCode: ""
+    }
+
+    var Student = {
+      id: 0,
+      code: "",
+      title: "",
+      description: "",
+      credits: 0,
+      prerequisites: []
+    }
+
+    function populateSelect(id) {
+      $.ajax({
+        url: '/api/Course/',
+        type: 'GET',
+        dataType: 'json',
+        success: function (students) {
+          $('#modalPreque .modal-body').append(`<select id="prerequites" multiple="multiple"></select>`);
+          $.each(students, function (index, student) {
+            if (student.id != id) {
+              $('#prerequites').append(`<option value="${student.id} ${student.code}">${student.code}</option>`);
+            }
+          });
+          $('#prerequites').multiselect();
+        },
+        error: function (request, message, error) {
+          alert("Da xay ra loi")
+        }
+      });
+
+    }
+
+    function getStudentList() {
+      $.ajax({
+        url: '/api/Course/',
+        type: 'GET',
+        dataType: 'json',
+        success: function (students) {
+          studentListSuccess(students);
+        },
+        error: function (request, message, error) {
+          alert("Da xay ra loi")
+        }
+      });
+    }
+
+    function studentListSuccess(students) {
+      $("#studentTable tbody").remove();
+      $.each(students, function (index, student) {
+        studentAddRow(student);
+      });
+    }
+
+    function studentAddRow(student) {
+      if ($("#studentTable tbody").length == 0) {
+        $("#studentTable").append("<tbody></tbody>");
+      }
+
+      $("#studentTable tbody").append(
+        studentBuildTableRow(student));
+
+      var td = $("#studentTable tbody").find(`[data-id='${student.id}']`).find('.preque');
+      student.prerequisites.forEach(function (item) {
+        $(td).append(`<p>${item.prereqCode} &nbsp </p>`);
+      });
+    }
+
+    function studentBuildTableRow(student) {
+      var newRow =
+        `<tr data-id="${student.id}">` +
+        `<td>${student.id}</td>` +
+        `<td>${student.code}</td>` +
+        `<td>${student.title}</td>` +
+        `<td>${student.credits}</td>` +
+        `<td>${student.description}</td>` +
+        `<td class='preque'><button class="btn btn-warning" data-id="${student.id}" data-code="${student.code}" onclick="editPrerequite(this)">Edit</button></td>` +
+        `<td>` +
+        `<button class="btn btn-warning" data-credits="${student.credits}" data-id="${student.id}" data-title="${student.title}" data-code="${student.code}" data-description="${student.description}" onclick="editStudentModal(this)">Update</button> &nbsp` +
+        `<button class="btn btn-danger" data-id="${student.id}" onclick="deleteStudent(this)">Delete</button>` +
+        `</td>` +
+        `</tr>`;
+      return newRow;
+    }
+
+    function editStudentModal(item) {
+      $('#modalCourse .modal-title').text('Edit Course');
+
+      $('#id').val($(item).data('id'));
+      $('#code').val($(item).data('code'));
+      $('#title').val($(item).data('title'));
+      $('#description').val($(item).data('description'));
+      $('#credits').val($(item).data('credits'))
+
+      $('#modalCourse').modal('show');
+    }
+
+    function deleteStudent(item) {
+      var id = $(item).data('id');
+      if (confirm("Bạn có chắc chắn muốn xóa: " + id)) {
+        $.ajax({
+          url: '/api/Course/Delete' + id,
+          type: 'DELETE',
+          dataType: 'html',
+          success: function (msg) {
+            getStudentList();
+            $.notify("Xoa thanh cong");
+          },
+          error: function (request, message, error) {
+            alert("Da xay ra loi");
+          }
+        });
+      }
+    }
+
+    function editPrerequite(item) {
+      var id = $(item).data('id');
+      var code = $(item).data('code');
+
+      $('#modalPreque .modal-body span ').remove();
+
+      populateSelect(id);
+
+      $('#modalPreque #savePrerequite').data('id', id);
+      $('#modalPreque #savePrerequite').data('code', code);
+
+      $('#modalPreque .modal-title').text(`Prerequisite for ${code}`);
+      $('#modalPreque').modal('show');
+    }
+
+  </script>
+}

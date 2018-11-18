@@ -14,6 +14,8 @@ namespace University.Entity
 		public long DepartmentId { get; set; }
 		public Department Department { get; set; }
 
+		public IEnumerable<Classroom> Classrooms { get; set; }
+
 		public string AccountId { get; set; }
 	}
 }

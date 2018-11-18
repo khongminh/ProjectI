@@ -18,9 +18,9 @@ namespace University.Data.Repository
 			entities = context.Set<T>();
 		}
 
-		public IEnumerable<T> GetAll()
+		public IQueryable<T> GetAll()
 		{
-			return entities.ToList();
+			return entities.AsQueryable<T>();
 		}
 
 		public async Task<IEnumerable<T>> GetAllAsync()

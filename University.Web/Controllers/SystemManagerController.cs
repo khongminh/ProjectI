@@ -24,76 +24,7 @@ namespace University.Web.Controllers
 			this.timeEnrollmentRepository = timeEnrollmentRepository;
 		}
 
-		[HttpGet]
-        public async Task<IActionResult> Index()
-        {
-			var departments = await this.departmentRepository.GetAllAsync();
-            return View(departments);
-        }
-
-		[HttpGet]
-		public async Task<IActionResult> DeptStudent(long id)
-		{
-			var department = await this.departmentRepository.GetStudents(id);
-			if(department == null)
-			{
-				return NotFound();
-			}
-			return View(department);
-		}
-
-		[HttpGet]
-		public async Task<IActionResult> DeptCourse(long id)
-		{
-			var department = await this.departmentRepository.GetCourses(id);
-			if (department == null)
-			{
-				return NotFound();
-			}
-			return View(department);
-		}
-
-		[HttpGet]
-		public async Task<IActionResult> DeptTeacher(long id)
-		{
-			var department = await this.departmentRepository.GetTeachers(id);
-			if (department == null)
-			{
-				return NotFound();
-			}
-			return View(department);
-		}
-
-		[HttpGet]
-		public IActionResult Create()
-		{
-			return View();
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> Create(CreateDepartmentVM departmentVM)
-		{
-			if (!ModelState.IsValid)
-				return BadRequest();
-
-			var userId = await this.userRepository.CreateUserRole(departmentVM.AdminAccount, departmentVM.Password, "DepartmentAdmin");
-			if (userId != null)
-			{
-				var newDepartment = new Department()
-				{
-					Deptname = departmentVM.DeptName,
-					Address = departmentVM.Address,
-					Website = departmentVM.Website,
-					AccountId = userId
-				};
-				this.departmentRepository.Insert(newDepartment);
-				await this.departmentRepository.SaveChangeAsync();
-				return RedirectToAction("Index");
-			}
-			ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi, vui lòng thử lại");
-			return View();
-		}
-
+		
 		[HttpGet]
 		public async Task<IActionResult> OpenEnrollmentCourse()
 		{

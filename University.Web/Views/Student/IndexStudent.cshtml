@@ -2,13 +2,13 @@
   ViewData["Title"] = "Index";
 }
 
-<table id="teacherTable" class="table table-bordered">
+<table id="studentTable" class="table table-bordered">
   <thead>
     <tr>
       <th>Id</th>
-      <th>Mã số</th>
-      <th>Ho tên</th>
-      <th>Thông tin</th>
+      <th>MSSV</th>
+      <th>Ho ten</th>
+      <th>Thong tin</th>
       <th><button id="insert" class="btn btn-primary">Insert</button></th>
     </tr>
   </thead>
@@ -25,19 +25,19 @@
         <form class="form-horizontal">
           <input id="id" hidden />
           <div class="form-group">
-            <label class="col-sm-2 control-label">Mã số</label>
+            <label class="col-sm-2 control-label">MSSV</label>
             <div class="col-sm-10">
               <input class="form-control" id="code">
             </div>
           </div>
           <div class="form-group">
-            <label class="col-sm-2 control-label">Họ tên</label>
+            <label class="col-sm-2 control-label">Ho ten</label>
             <div class="col-sm-10">
               <input class="form-control" id="name">
             </div>
           </div>
           <div class="form-group">
-            <label class="col-sm-2 control-label">Thông tin</label>
+            <label class="col-sm-2 control-label">Thong tin</label>
             <div class="col-sm-10">
               <input class="form-control" id="information">
             </div>
@@ -55,10 +55,10 @@
 @section Scripts{
   <script>
     $(document).ready(function () {
-      getTeacherList();
+      getStudentList();
 
       $('#insert').click(function () {
-        $('.modal-title').text("Add Teacher");
+        $('.modal-title').text("Add Student");
         $('.modal').modal({ show: true });
         console.log($('#id').val());
       });
@@ -71,7 +71,7 @@
       });
 
       $('#saveModal').click(function () {
-        var obj = Teacher;
+        var obj = Student;
         obj.id = $('#id').val();
         obj.code = $('#code').val();
         obj.name = $('#name').val();
@@ -79,14 +79,14 @@
 
         if (obj.id == 0) {
           $.ajax({
-            url: '/api/AddTeacher',
+            url: '/api/Student/Add',
             type: 'POST',
             data: JSON.stringify(obj),
             contentType: 'application/json',
             dataType: 'html',
             success: function (msg) {
               $('.modal').modal('hide');
-              getTeacherList();
+              getStudentList();
               $.notify("Thêm thành công");
             },
             error: function () {
@@ -97,7 +97,7 @@
         }
         else {
           $.ajax({
-            url: '/api/UpdateStudent/' + obj.id,
+            url: '/api/Student/Update' + obj.id,
             type: 'PUT',
             data: JSON.stringify(obj),
             contentType: 'application/json',
@@ -117,7 +117,7 @@
 
     });
 
-    var Teacher = {
+    var Student = {
       id: 0,
       code: "",
       name: "",
@@ -125,13 +125,13 @@
     }
 
     // Get all Employees to display
-    function getTeacherList() {
+    function getStudentList() {
       $.ajax({
-        url: '/api/GetTeachers/',
+        url: '/api/Student/',
         type: 'GET',
         dataType: 'json',
-        success: function (teachers) {
-          teacherListSuccess(teachers);
+        success: function (students) {
+          studentListSuccess(students);
         },
         error: function (request, message, error) {
           alert("Da xay ra loi")
@@ -139,39 +139,39 @@
       });
     }
 
-    function teacherListSuccess(teachers) {
-      $("#teacherTable tbody").remove();
-      $.each(teachers, function (index, teacher) {
-        teacherAddRow(teacher);
+    function studentListSuccess(students) {
+      $("#studentTable tbody").remove();
+      $.each(students, function (index, student) {
+        studentAddRow(student);
       });
     }
 
-    function teacherAddRow(teacher) {
-      if ($("#teacherTable tbody").length == 0) {
-        $("#teacherTable").append("<tbody></tbody>");
+    function studentAddRow(employee) {
+      if ($("#studentTable tbody").length == 0) {
+        $("#studentTable").append("<tbody></tbody>");
       }
 
-      $("#teacherTable tbody").append(
-        teacherBuildTableRow(teacher));
+      $("#studentTable tbody").append(
+        studentBuildTableRow(employee));
     }
 
-    function teacherBuildTableRow(teacher) {
+    function studentBuildTableRow(student) {
       var newRow =
         `<tr>` +
-        `<td>${teacher.id}</td>` +
-        `<td>${teacher.code}</td>` +
-        `<td>${teacher.name}</td>` +
-        `<td>${teacher.information}</td>` +
+        `<td>${student.id}</td>` +
+        `<td>${student.code}</td>` +
+        `<td>${student.name}</td>` +
+        `<td>${student.information}</td>` +
         `<td>` +
-        `<button class="btn btn-warning" data-id="${teacher.id}" data-name="${teacher.name}" data-information="${teacher.information}" data-code="${teacher.code}" onclick="editTeacherModal(this)">Update</button> &nbsp` +
-        `<button class="btn btn-danger" data-id="${teacher.id}" onclick="deleteTeacher(this)">Delete</button>` +
+        `<button class="btn btn-warning" data-id="${student.id}" data-name="${student.name}" data-information="${student.information}" data-code="${student.code}" onclick="editStudentModal(this)">Update</button> &nbsp` +
+        `<button class="btn btn-danger" data-id="${student.id}" onclick="deleteStudent(this)">Delete</button>` +
         `</td>` +
         `</tr>`;
       return newRow;
     }
 
-    function editTeacherModal(item) {
-      $('.modal-title').text('Edit Teacher');
+    function editStudentModal(item) {
+      $('.modal-title').text('Edit Student');
 
       console.log($(item).data('name'));
       $('#id').val($(item).data('id'));
@@ -182,15 +182,15 @@
       $('.modal').modal({ show: true });
     }
 
-    function deleteTeacher(item) {
+    function deleteStudent(item) {
       var id = $(item).data('id');
       if (confirm("Bạn có chắc chắn muốn xóa: " + id)) {
         $.ajax({
-          url: '/api/DeleteTeacher/'+id,
+          url: '/api/Student/Delete/'+id,
           type: 'DELETE',
           dataType: 'html',
           success: function (msg) {
-            getTeacherList();
+            getStudentList();
             $.notify("Xoa thanh cong");
           },
           error: function (request, message, error) {

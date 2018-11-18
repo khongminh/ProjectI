@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using University.Data;
 using University.Data.Repository;
+using University.Web.Hubs;
 
 namespace University.Web
 {
@@ -50,6 +51,7 @@ namespace University.Web
 			services.AddTransient<DepartmentRepository>();
 			services.AddTransient<UserRepository>();
 			services.AddTransient<DbInitializer>();
+			services.AddSignalR();
 
 			services.AddMvc().AddJsonOptions(options =>
 			{
@@ -76,6 +78,11 @@ namespace University.Web
 			app.UseStaticFiles();
 			app.UseCookiePolicy();
 			app.UseAuthentication();
+
+			app.UseSignalR(routes =>
+			{
+				routes.MapHub<EnrollmentHub>("/enrollment");
+			});
 
 			app.UseMvc(routes =>
 			{

@@ -14,6 +14,5 @@ namespace University.Web.Models
 		public string Description { get; set; }
 		public int Credits { get; set; }
 
-		public IEnumerable<Prerequisite> Prerequisite { get; set; }
 	}
 }

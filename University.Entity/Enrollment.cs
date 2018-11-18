@@ -12,7 +12,7 @@ namespace University.Entity
 		public long StudentId { get; set; }
 		public Student Student { get; set; }
 
-		public int MidGrade { get; set; }
-		public int FinalGrade { get; set; }
+		public Nullable<double> MidGrade { get; set; }
+		public Nullable<double> FinalGrade { get; set; }
 	}
 }

@@ -188,25 +188,23 @@ namespace University.Data.Migrations
 
                     b.Property<string>("Code");
 
-                    b.Property<long?>("CourseId");
+                    b.Property<long>("CourseId");
 
-                    b.Property<string>("CourserId");
+                    b.Property<int>("MaxStudent");
 
-                    b.Property<string>("Semester");
+                    b.Property<long>("Semester");
 
-                    b.Property<string>("TeacherId");
-
-                    b.Property<long?>("TeacherId1");
+                    b.Property<long>("TeacherId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("TeacherId1");
+                    b.HasIndex("TeacherId");
 
                     b.HasIndex("Code", "Semester")
                         .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL AND [Semester] IS NOT NULL");
+                        .HasFilter("[Code] IS NOT NULL");
 
                     b.ToTable("Classroom");
                 });
@@ -249,6 +247,8 @@ namespace University.Data.Migrations
 
                     b.Property<string>("Address");
 
+                    b.Property<string>("DeptEgName");
+
                     b.Property<string>("Deptname");
 
                     b.Property<string>("Website");
@@ -270,9 +270,9 @@ namespace University.Data.Migrations
 
                     b.Property<long>("ClassroomId");
 
-                    b.Property<int>("FinalGrade");
+                    b.Property<double?>("FinalGrade");
 
-                    b.Property<int>("MidGrade");
+                    b.Property<double?>("MidGrade");
 
                     b.Property<long>("StudentId");
 
@@ -291,7 +291,9 @@ namespace University.Data.Migrations
 
                     b.Property<long>("PrereqId");
 
-                    b.Property<long>("Id");
+                    b.Property<string>("CourseCode");
+
+                    b.Property<string>("PrereqCode");
 
                     b.HasKey("CourseId", "PrereqId");
 
@@ -307,8 +309,6 @@ namespace University.Data.Migrations
                     b.Property<string>("AccountId")
                         .IsRequired();
 
-                    b.Property<long?>("ClassroomId");
-
                     b.Property<string>("Code");
 
                     b.Property<long>("DepartmentId");
@@ -318,8 +318,6 @@ namespace University.Data.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassroomId");
 
                     b.HasIndex("Code")
                         .IsUnique()
@@ -449,12 +447,14 @@ namespace University.Data.Migrations
             modelBuilder.Entity("University.Entity.Classroom", b =>
                 {
                     b.HasOne("University.Entity.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId");
+                        .WithMany("Classrooms")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("University.Entity.Teacher", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId1");
+                        .WithMany("Classrooms")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Course", b =>
@@ -468,22 +468,26 @@ namespace University.Data.Migrations
             modelBuilder.Entity("University.Entity.Enrollment", b =>
                 {
                     b.HasOne("University.Entity.Classroom", "Classroom")
-                        .WithMany()
+                        .WithMany("Enrollments")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("University.Entity.Student", "Student")
-                        .WithMany()
+                        .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("University.Entity.Prerequisite", b =>
+                {
+                    b.HasOne("University.Entity.Course", "Course")
+                        .WithMany("Prerequisites")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Student", b =>
                 {
-                    b.HasOne("University.Entity.Classroom")
-                        .WithMany("Students")
-                        .HasForeignKey("ClassroomId");
-
                     b.HasOne("University.Entity.Department", "Department")
                         .WithMany("Students")
                         .HasForeignKey("DepartmentId")
@@ -501,7 +505,7 @@ namespace University.Data.Migrations
             modelBuilder.Entity("University.Entity.TimeSlot", b =>
                 {
                     b.HasOne("University.Entity.Classroom", "Classroom")
-                        .WithMany()
+                        .WithMany("TimeSlots")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

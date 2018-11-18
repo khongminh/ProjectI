@@ -10,8 +10,8 @@ using University.Data;
 namespace University.Data.Migrations
 {
     [DbContext(typeof(UniversityContext))]
-    [Migration("20181006065847_Init")]
-    partial class Init
+    [Migration("20181113120755_CreateDb")]
+    partial class CreateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -138,11 +138,9 @@ namespace University.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128);
+                    b.Property<string>("LoginProvider");
 
-                    b.Property<string>("ProviderKey")
-                        .HasMaxLength(128);
+                    b.Property<string>("ProviderKey");
 
                     b.Property<string>("ProviderDisplayName");
 
@@ -173,11 +171,9 @@ namespace University.Data.Migrations
                 {
                     b.Property<string>("UserId");
 
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128);
+                    b.Property<string>("LoginProvider");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(128);
+                    b.Property<string>("Name");
 
                     b.Property<string>("Value");
 
@@ -194,25 +190,23 @@ namespace University.Data.Migrations
 
                     b.Property<string>("Code");
 
-                    b.Property<long?>("CourseId");
+                    b.Property<long>("CourseId");
 
-                    b.Property<string>("CourserId");
+                    b.Property<int>("MaxStudent");
 
-                    b.Property<string>("Semester");
+                    b.Property<long>("Semester");
 
-                    b.Property<string>("TeacherId");
-
-                    b.Property<long?>("TeacherId1");
+                    b.Property<long>("TeacherId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("TeacherId1");
+                    b.HasIndex("TeacherId");
 
                     b.HasIndex("Code", "Semester")
                         .IsUnique()
-                        .HasFilter("[Code] IS NOT NULL AND [Semester] IS NOT NULL");
+                        .HasFilter("[Code] IS NOT NULL");
 
                     b.ToTable("Classroom");
                 });
@@ -227,9 +221,7 @@ namespace University.Data.Migrations
 
                     b.Property<int>("Credits");
 
-                    b.Property<int>("DepartmentId");
-
-                    b.Property<long?>("DepartmentId1");
+                    b.Property<long>("DepartmentId");
 
                     b.Property<string>("Description");
 
@@ -241,7 +233,7 @@ namespace University.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.HasIndex("DepartmentId1");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Course");
                 });
@@ -258,6 +250,8 @@ namespace University.Data.Migrations
                     b.Property<string>("Address");
 
                     b.Property<string>("Deptname");
+
+                    b.Property<string>("Website");
 
                     b.HasKey("Id");
 
@@ -297,7 +291,9 @@ namespace University.Data.Migrations
 
                     b.Property<long>("PrereqId");
 
-                    b.Property<long>("Id");
+                    b.Property<string>("CourseCode");
+
+                    b.Property<string>("PrereqCode");
 
                     b.HasKey("CourseId", "PrereqId");
 
@@ -313,13 +309,9 @@ namespace University.Data.Migrations
                     b.Property<string>("AccountId")
                         .IsRequired();
 
-                    b.Property<long?>("ClassroomId");
-
                     b.Property<string>("Code");
 
-                    b.Property<int>("DepartmentId");
-
-                    b.Property<long?>("DepartmentId1");
+                    b.Property<long>("DepartmentId");
 
                     b.Property<string>("Information");
 
@@ -327,13 +319,11 @@ namespace University.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassroomId");
-
                     b.HasIndex("Code")
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.HasIndex("DepartmentId1");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Student");
                 });
@@ -349,9 +339,7 @@ namespace University.Data.Migrations
 
                     b.Property<string>("Code");
 
-                    b.Property<int>("DepartmentId");
-
-                    b.Property<long?>("DepartmentId1");
+                    b.Property<long>("DepartmentId");
 
                     b.Property<string>("Information");
 
@@ -363,7 +351,7 @@ namespace University.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.HasIndex("DepartmentId1");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Teacher");
                 });
@@ -376,15 +364,14 @@ namespace University.Data.Migrations
 
                     b.Property<DateTime>("EndTime");
 
-                    b.Property<string>("Semester");
+                    b.Property<long>("Semester");
 
                     b.Property<DateTime>("StartTime");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Semester")
-                        .IsUnique()
-                        .HasFilter("[Semester] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("TimeEnrollment");
                 });
@@ -460,56 +447,65 @@ namespace University.Data.Migrations
             modelBuilder.Entity("University.Entity.Classroom", b =>
                 {
                     b.HasOne("University.Entity.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId");
+                        .WithMany("Classrooms")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("University.Entity.Teacher", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId1");
+                        .WithMany("Classrooms")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Course", b =>
                 {
                     b.HasOne("University.Entity.Department", "Department")
                         .WithMany("Courses")
-                        .HasForeignKey("DepartmentId1");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Enrollment", b =>
                 {
                     b.HasOne("University.Entity.Classroom", "Classroom")
-                        .WithMany()
+                        .WithMany("Enrollments")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("University.Entity.Student", "Student")
-                        .WithMany()
+                        .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("University.Entity.Prerequisite", b =>
+                {
+                    b.HasOne("University.Entity.Course", "Course")
+                        .WithMany("Prerequisites")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Student", b =>
                 {
-                    b.HasOne("University.Entity.Classroom")
-                        .WithMany("Students")
-                        .HasForeignKey("ClassroomId");
-
                     b.HasOne("University.Entity.Department", "Department")
                         .WithMany("Students")
-                        .HasForeignKey("DepartmentId1");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.Teacher", b =>
                 {
                     b.HasOne("University.Entity.Department", "Department")
                         .WithMany("Teachers")
-                        .HasForeignKey("DepartmentId1");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("University.Entity.TimeSlot", b =>
                 {
                     b.HasOne("University.Entity.Classroom", "Classroom")
-                        .WithMany()
+                        .WithMany("TimeSlots")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

@@ -1,0 +1,212 @@
+﻿@{
+  ViewData["Title"] = "IndexOpenCourse";
+}
+
+<h3 class="text-center">Danh sách lớp kỳ @ViewData["semester"]</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Mã học phần</th>
+      <th>Tên học phần</th>
+      <th>Danh sách lớp mở</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="modalClass" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" id="classForm">
+          <input type="number" hidden id="courseid" />
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Mã lớp</label>
+            <div class="col-sm-5">
+              <input class="form-control" id="code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Số lượng max</label>
+            <div class="col-sm-5">
+              <input type="number" class="form-control" id="maxstudent">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Giảng viên</label>
+            <div class="col-sm-5">
+              <select class="form-control" id="teacherid"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Thời gian</label>
+            <div class="col-sm-10 form-inline time">
+              <select class="form-control">
+                <option value="Monday">Thứ hai</option>
+                <option value="Tuesday">Thứ ba</option>
+                <option value="Wednesday">Thứ tư</option>
+                <option value="Thursday">Thứ năm</option>
+                <option value="Friday">Thứ sáu</option>
+                <option value="Saturday">Thứ bảy</option>
+                <option value="Sunday">Chủ nhật</option>
+              </select>&nbsp&nbsp&nbsp&nbsp
+              <input name="start" class="form-control" type="time" placeholder="Bắt đầu" />&nbsp
+              <input name="end" class="form-control" type="time" placeholder="Kết thúc" />&nbsp&nbsp&nbsp
+              <input name="room" class="form-control" placeholder="Phòng học" style="width: 100px" />&nbsp
+              <span class="glyphicon glyphicon-plus" onclick="addTimeSlot()"></span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveModal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@section Scripts{
+  <script>
+    $(document).ready(function () {
+
+      getCourses();
+      getTeachers();
+
+      $('#saveModal').click(function () {
+        var obj = new Object();
+        obj.code = $('#code').val();
+        obj.semester = $('#semester').val();
+        obj.maxstudent = Number($('#maxstudent').val());
+        obj.courseid = Number($('#courseid').val());
+        obj.teacherid = Number($('#teacherid').val());
+        obj.timeslots = [];
+
+        $('form .time').each(function (index, element) {
+          var timeslot = new Object();
+          timeslot.day = $(element).find('select').val();
+          timeslot.starttime = $(element).find("[name = 'start']").val();
+          timeslot.endtime = $(element).find("[name = 'end']").val();
+          timeslot.room = $(element).find("[name = 'room']").val();
+
+          obj.timeslots.push(timeslot);
+        });
+
+        $.ajax({
+          url: '/api/Classroom/Create/',
+          type: 'POST',
+          data: JSON.stringify(obj),
+          contentType: 'application/json',
+          dataType: 'html',
+          success: function (msg) {
+            $('.modal').modal('hide');
+            $.notify("Thêm thành công");
+            getCourses();
+          },
+          error: function () {
+            $('.modal').modal('hide');
+            $.notify("Da xay ra loi");
+          }
+        });
+      });
+
+    })
+
+    function showClassDetail(classroom) {
+      console.log(classroom);
+      $('.modal .modal-title').text(`Mã lớp ${classroom.code}`);
+      $('#code').val(classroom.code);
+      $('#semester').val(classroom.semester);
+      $('#maxstudent').val(classroom.maxstudent);
+      $('#courseid').val(classroom.courseid);
+      $('#teacherid').val(classroom.teacherid);
+
+      $('#modalClass').modal('show');
+    }
+
+    function getCourses() {
+      $.ajax({
+        url: '/api/CourseWithClass/' + @ViewData["semesterId"],
+        type: 'GET',
+        dataType: 'json',
+        success: function (courses) {
+          $('tbody').empty();
+          $.each(courses, function (index, course) {
+            var tr = `<tr><td>${course.code}</td><td>${course.title}</td><td>`
+            $.each(course.classrooms, function (index, classroom){
+              tr += `<p onclick="showClassDetail(${classroom})" class="btn btn-link">${classroom.code}</p>`;
+            })
+            tr += `</td>`;
+            tr += `<td><button data-id="${course.id}" data-code="${course.code}" class="btn btn-primary" onclick="showClassModal(this)">Mở lớp</button></td>`;
+            tr += `</tr>`;
+
+            $('tbody').append(tr);
+          });
+        },
+        error: function () {
+          $.notify('Loi');
+        }
+      });
+    }
+
+    function getTeachers() {
+      $.ajax({
+        url: '/api/Teacher',
+        type: 'GET',
+        dataType: 'json',
+        success: function (teachers) {
+          $.each(teachers, function (index, teacher) {
+            $('#teacherid').append(`<option value='${teacher.id}'>${teacher.name}</option>`);
+          });
+        },
+        error: function () {
+          $.notify('Loi');
+        }
+      });
+    }
+
+    function showClassModal(element) {
+      var id = $(element).data('id');
+      var code = $(element).data('code');
+      $('#modalClass .modal-title').text(`Mở lớp cho học phần ${code}`)
+      $('#courseid').val(Number(id));
+      $('#modalClass').modal('show');
+    }
+
+    function addTimeSlot() {
+      $('#modalClass form').append(`<div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-10 form-inline time">
+              <select class="form-control" name="day">
+                <option value="Monday">Thứ hai</option>
+                <option value="Tuesday">Thứ ba</option>
+                <option value="Wednesday">Thứ tư</option>
+                <option value="Thursday">Thứ năm</option>
+                <option value="Friday">Thứ sáu</option>
+                <option value="Saturday">Thứ bảy</option>
+                <option value="Sunday">Chủ nhật</option>
+              </select>&nbsp&nbsp&nbsp&nbsp
+              <input name="start" class="form-control" type="time" placeholder="Bắt đầu" />&nbsp
+              <input name="end" class="form-control" type="time" placeholder="Kết thúc" />&nbsp&nbsp&nbsp
+              <input name="room" class="form-control" placeholder="Phòng học" style="width: 100px" />&nbsp
+              <span class="glyphicon glyphicon-remove" onclick="removeTimeSlot(this)"></span>
+            </div>
+          </div>`)
+    }
+
+    function removeTimeSlot(element) {
+      $(element).parent().parent().remove();
+    }
+  </script>
+}
+
+
+
+
+

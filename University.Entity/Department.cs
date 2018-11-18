@@ -14,6 +14,7 @@ namespace University.Entity
 		}
 
 		public string Deptname { get; set; }
+		public string DeptEgName { get; set; }
 		public string Address { get; set; }
 		public string Website { get; set; }
 

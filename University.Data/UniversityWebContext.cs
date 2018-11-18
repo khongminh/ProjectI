@@ -58,6 +58,7 @@ namespace University.Data
 			builder.Entity<Course>().HasIndex(s => s.Code).IsUnique(true);
 			builder.Entity<Classroom>().HasIndex(c => new { c.Code, c.Semester }).IsUnique(true);
 			builder.Entity<Prerequisite>().HasKey(p => new { p.CourseId, p.PrereqId });
+			builder.Entity<Prerequisite>().Ignore(p => p.Id);
 			builder.Entity<TimeEnrollment>().HasIndex(t => t.Semester).IsUnique(true);
 			
 		}

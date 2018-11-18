@@ -2,12 +2,12 @@
 
 namespace University.Data.Migrations
 {
-    public partial class Change1 : Migration
+    public partial class ChangeDept : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Website",
+                name: "DeptEgName",
                 table: "Department",
                 nullable: true);
         }
@@ -15,7 +15,7 @@ namespace University.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Website",
+                name: "DeptEgName",
                 table: "Department");
         }
     }

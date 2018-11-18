@@ -1,0 +1,43 @@
+﻿@model IEnumerable<University.Entity.TimeEnrollment>
+@{
+  ViewData["Title"] = "IndexOpenCourse";
+}
+
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+    <h4 class="text-center">Danh sách kỳ học</h4>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Kỳ học</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model)
+        {
+          if (item.StartTime > DateTime.Now)
+          {
+            <tr>
+              <td>@item.Semester</td>
+              <td><a class="btn btn-link" asp-action="IndexOpenCourse" asp-route-semesterId="@item.Id">Mở lớp</a></td>
+            </tr>
+          }
+          else
+          {
+            <tr>
+              <td>@item.Semester</td>
+              <td><a class="btn btn-link" asp-action="IndexOpenCourse" asp-route-semesterId="@item.Id">Xem chi tiết</a></td>
+            </tr>
+          }
+
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
